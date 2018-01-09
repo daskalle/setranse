@@ -5,7 +5,7 @@ todo module docstring
 
 class GeoPoint(object):
     '''
-    allgemeine Klasse für Vermessungspunkte
+    general class for geodetic coordinates
     '''
 
     def __init__(self, pnr, east, north, elev=0, csys=None):
@@ -21,7 +21,7 @@ class GeoPoint(object):
 
     def infer_csys(self):
         """
-        todo docstring
+        tries to infer the code of the coordinate system from coordinate values
         """
         if (self.east >= 33369300) and (self.east <= 33417000):
             if (self.north >= 5799000) and (self.north <= 5837500):
@@ -34,12 +34,16 @@ class GeoPoint(object):
 
     def set_coosys(self, csys="000"):
         """
-        todo docstring
+        sets the code of the coordinate system and updates automatically
+        the code of the numbering area
         """
         self.csys = str(csys).ljust(3)[:3]
         self.set_numbez()
 
     def reset_coo(self, east, north, elev=None, csys=None, infercs=False):
+        """
+        resets coordinate values and optionally code of the coordinate system inplace
+        """
         self.east = east
         self.north = north
         if elev:
@@ -51,20 +55,20 @@ class GeoPoint(object):
 
     def set_code(self, code):
         """
-        todo docstring
+        sets pointcode and extended pointcode (used in BAVs)
         """
         self.code = str(code).ljust(3)[:3]
         self.xcode = '5' + self.code
 
     def set_desc(self, desc):
         """
-        todo docstring
+        sets description string for point
         """
         self.desc = str(desc).ljust(13)[:13]
 
     def set_numbez(self, numbez=None):
         """
-        todo docstring
+        sets code of numbering area
         """
         if numbez:
             self.numbez = str(numbez).rjust(8, '0')[:8]
@@ -75,6 +79,9 @@ class GeoPoint(object):
                 self.numbez = '00000000'
 
     def to_bav(self):
+        """
+        generates point representation used in BAV coordinate files
+        """
         retval = ("{}      {} {} {:^10}   Y {:>12.3f} "
                   "X {:>13.3f} Z {:>9.3f} C {} {:<13}")
 
