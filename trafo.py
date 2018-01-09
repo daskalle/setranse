@@ -8,7 +8,7 @@ import numpy as np
 
 class Trafo(object):
     '''
-    docstring goes here
+    class that performs the transformation operations
     '''
 
     def __init__(self, precision=3):
@@ -33,14 +33,13 @@ class Trafo(object):
         yx = np.round(self.f_e2s([(easting, northing)])[0], self.precision)
         return yx[0], yx[1], round(elevation, self.precision)
 
+    def trasform(self, point, kind):
+        if kind.lower() == 's2e':
+            x, y, z = self.transform_to_etrs(point.east, point.north, point.elev)
+            point.reset_coo(x, y, z, "489")
 
-t = Trafo(4)
-
-s0 = (30000, 30000, 50)
-e0 = (33396901.855, 5828517.635, 50)
-
-e1 = t.transform_to_etr(*s0)
-s1 = t.transform_to_oldner(*e0)
-
-print(np.array(s0) - np.array(s1))
-print(np.array(e0) - np.array(e1))
+        elif kind.lower() == 'e2s':
+            x, y, z = self.transform_to_soldner(point.east, point.north, point.elev)
+            point.reset_coo(x, y, z, "500")
+        else:
+            raise ValueError("argument 'kind' should be either 's2e' or 'e2s'")

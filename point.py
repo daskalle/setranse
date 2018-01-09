@@ -37,6 +37,17 @@ class GeoPoint(object):
         todo docstring
         """
         self.csys = str(csys).ljust(3)[:3]
+        self.set_numbez()
+
+    def reset_coo(self, east, north, elev=None, csys=None, infercs=False):
+        self.east = east
+        self.north = north
+        if elev:
+            self.elev = elev
+        if csys:
+            self.set_coosys(csys)
+        elif infercs:
+            self.set_coosys(self.infercs())
 
     def set_code(self, code):
         """
