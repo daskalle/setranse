@@ -19,6 +19,7 @@ class CooReader:
 
         self.rex_bav = re.compile(bavstring, re.IGNORECASE)
 
+
     def readdata(self, filename):
         '''
         todo docstring
@@ -69,4 +70,3 @@ class CooReader:
 cr = CooReader()
 
 cr.readdata('17-005-lp-kv.bav')
-# print(cr.readdata('17-005-lp-kv.bav'))
