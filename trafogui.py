@@ -19,7 +19,7 @@ class MyWindow(QMainWindow):
 
         self.setGeometry(27, 49, 800, 600)
         self.setWindowIcon(QIcon("test_run_48.png"))
-        self.setWindowTitle("Transe")
+        self.setWindowTitle("S-E-Transe")
 
         self.pmodel = PointsetModel()
         reader = CooReader()
