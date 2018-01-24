@@ -16,12 +16,21 @@ class CooReader:
         self.rex = self.build_read_pattern()
 
     def readdata(self, filename):
-        '''
-        todo docstring
-        '''
+        """reads all pointdata from given file
+
+        Parameters:
+        ----------
+        filename : string
+            full local path to coordinate file
+        Returns
+        -------
+        list of GeoPoint objects
+            all points converted from data in coordinate files
+        """
+
         try:
-            with open(filename, 'r') as f:
-                rawdata = f.readlines()
+            with open(filename, 'r') as datafile:
+                rawdata = datafile.readlines()
                 rawdata = [line.rstrip('\r\n') for line in rawdata]
 
         except OSError as exc:
@@ -33,9 +42,18 @@ class CooReader:
         return coodata
 
     def _topoint(self, line):
-        '''
-        todo docstring
-        '''
+        """converts string to GeoPoint based on actual regex pattern
+
+        Parameters:
+        ----------
+        line : string
+            line to parse read from coordinate file
+        Returns
+        -------
+        GeoPoint Object
+            geodesic point with 2D or 3D coordinates + meta data
+        """
+
         match = self.rex.match(line)
 
         ptnr = match.group('name')
@@ -61,8 +79,26 @@ class CooReader:
 
         return pnt
 
-    def build_read_pattern(self):
-        if self.fmt.lower() == 'bav':
+    def build_read_pattern(self, fmt, sep=' '):
+        """creates the regex-pattern string according to a given format string
+
+        Parameters:
+        ----------
+        fmt : string
+            character sequence of keys determining the value types in the data string
+            valid characters:
+                'p' or 'p's
+        sep : character, optional
+            character that separates data fields
+            (the default is a space character)
+        Returns
+        -------
+        SRE_Pattern
+            precompiled regex pattern to match against a single line string
+            representing one point
+        """
+
+        if fmt.lower() == 'bav':
             bavstring = r"^(?P<sys>\d{1,3}) +(?P<xcode>\d.{3}) +(?P<nb>\d+) +"
             bavstring += r"(?P<name>[\w\.]+) +y +(?P<ost>\d+\.\d+) +x +"
             bavstring += r"(?P<nord>\d+\.\d+) +z +(?P<z>\d+\.\d+)? +c +"
@@ -79,10 +115,10 @@ class CooReader:
                        'b': r'(?P<beschr>[\w\.-]{,13})',
                        't': r'(?P<text>[\w\.- ]+)'}
 
-            fmtkeys = list(self.fmt.lower())
+            fmtkeys = list(fmt.lower())
 
             fmtstring = [pattern[key] for key in fmtkeys]
 
-            fmtstring = self.sep.join(fmtstring)
+            fmtstring = sep.join(fmtstring)
 
             return re.compile(fmtstring, re.IGNORECASE)
