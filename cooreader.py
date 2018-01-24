@@ -13,7 +13,7 @@ class CooReader:
         super(CooReader, self).__init__()
         self.fmt = fmt
         self.sep = sep
-        self.rex = self.build_read_pattern()
+        self.rex = self.build_read_pattern(fmt, sep)
 
     def readdata(self, filename):
         """reads all pointdata from given file
