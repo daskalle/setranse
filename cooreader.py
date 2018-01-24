@@ -13,7 +13,7 @@ class CooReader:
         super(CooReader, self).__init__()
         self.fmt = fmt
         self.sep = sep
-        self.rex = self.build_read_pattern(fmt, sep)
+        self.rex = self._build_read_pattern()
 
     def readdata(self, filename):
         """reads all pointdata from given file
@@ -79,18 +79,9 @@ class CooReader:
 
         return pnt
 
-    def build_read_pattern(self, fmt, sep=' '):
+    def _build_read_pattern(self):
         """creates the regex-pattern string according to a given format string
 
-        Parameters:
-        ----------
-        fmt : string
-            character sequence of keys determining the value types in the data string
-            valid characters:
-                'p' or 'p's
-        sep : character, optional
-            character that separates data fields
-            (the default is a space character)
         Returns
         -------
         SRE_Pattern
@@ -98,13 +89,11 @@ class CooReader:
             representing one point
         """
 
-        if fmt.lower() == 'bav':
-            bavstring = r"^(?P<sys>\d{1,3}) +(?P<xcode>\d.{3}) +(?P<nb>\d+) +"
-            bavstring += r"(?P<name>[\w\.]+) +y +(?P<ost>\d+\.\d+) +x +"
-            bavstring += r"(?P<nord>\d+\.\d+) +z +(?P<z>\d+\.\d+)? +c +"
-            bavstring += r"(?P<pktcode>.{3}) *(?P<beschr>[\w\.-]* *[\w\.-]*){0,1}"
-
-            return re.compile(bavstring, re.IGNORECASE)
+        if self.fmt.lower() == 'bav':
+            patternstring = r"^(?P<sys>\d{1,3}) +(?P<xcode>\d.{3}) +(?P<nb>\d+) +"
+            patternstring += r"(?P<name>[\w\.]+) +y +(?P<ost>\d+\.\d+) +x +"
+            patternstring += r"(?P<nord>\d+\.\d+) +z +(?P<z>\d+\.\d+)? +c +"
+            patternstring += r"(?P<pktcode>.{3}) *(?P<beschr>[\w\.-]* *[\w\.-]*){0,1}"
 
         else:
             pattern = {'p': r'(?P<name>\w[\w\.]*)',
@@ -115,10 +104,8 @@ class CooReader:
                        'b': r'(?P<beschr>[\w\.-]{,13})',
                        't': r'(?P<text>[\w\.- ]+)'}
 
-            fmtkeys = list(fmt.lower())
+            fmtkeys = list(self.fmt.lower())
+            patternstring = [pattern[key] for key in fmtkeys]
+            patternstring = self.sep.join(patternstring)
 
-            fmtstring = [pattern[key] for key in fmtkeys]
-
-            fmtstring = sep.join(fmtstring)
-
-            return re.compile(fmtstring, re.IGNORECASE)
+        return re.compile(pattern, re.IGNORECASE)
