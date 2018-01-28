@@ -3,7 +3,7 @@ todo Docstring
 """
 
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.QtGui import QIcon
 from pointsetmodel import PointsetModel
 from pointslistview import PointsListView
@@ -31,8 +31,8 @@ class MyWindow(QMainWindow):
 
         self.show()
 
+if __name__ == '__main__':
+    application = QApplication(sys.argv)
+    wind = MyWindow()
 
-application = QApplication(sys.argv)
-wind = MyWindow()
-
-sys.exit(application.exec_())
+    sys.exit(application.exec_())
