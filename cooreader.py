@@ -13,15 +13,24 @@ class CooReader:
         super(CooReader, self).__init__()
         self.fmt = fmt
         self.sep = sep
-        self.rex = self.build_read_pattern()
+        self.rex = self._build_read_pattern()
 
     def readdata(self, filename):
-        '''
-        todo docstring
-        '''
+        """reads all pointdata from given file
+
+        Parameters:
+        ----------
+        filename : string
+            full local path to coordinate file
+        Returns
+        -------
+        list of GeoPoint objects
+            all points converted from data in coordinate files
+        """
+
         try:
-            with open(filename, 'r') as f:
-                rawdata = f.readlines()
+            with open(filename, 'r') as datafile:
+                rawdata = datafile.readlines()
                 rawdata = [line.rstrip('\r\n') for line in rawdata]
 
         except OSError as exc:
@@ -33,9 +42,18 @@ class CooReader:
         return coodata
 
     def _topoint(self, line):
-        '''
-        todo docstring
-        '''
+        """converts string to GeoPoint based on actual regex pattern
+
+        Parameters:
+        ----------
+        line : string
+            line to parse read from coordinate file
+        Returns
+        -------
+        GeoPoint Object
+            geodesic point with 2D or 3D coordinates + meta data
+        """
+
         match = self.rex.match(line)
 
         ptnr = match.group('name')
@@ -61,14 +79,21 @@ class CooReader:
 
         return pnt
 
-    def build_read_pattern(self):
-        if self.fmt.lower() == 'bav':
-            bavstring = r"^(?P<sys>\d{1,3}) +(?P<xcode>\d.{3}) +(?P<nb>\d+) +"
-            bavstring += r"(?P<name>[\w\.]+) +y +(?P<ost>\d+\.\d+) +x +"
-            bavstring += r"(?P<nord>\d+\.\d+) +z +(?P<z>\d+\.\d+)? +c +"
-            bavstring += r"(?P<pktcode>.{3}) *(?P<beschr>[\w\.-]* *[\w\.-]*){0,1}"
+    def _build_read_pattern(self):
+        """creates the regex-pattern string according to a given format string
 
-            return re.compile(bavstring, re.IGNORECASE)
+        Returns
+        -------
+        SRE_Pattern
+            precompiled regex pattern to match against a single line string
+            representing one point
+        """
+
+        if self.fmt.lower() == 'bav':
+            patternstring = r"^(?P<sys>\d{1,3}) +(?P<xcode>\d.{3}) +(?P<nb>\d+) +"
+            patternstring += r"(?P<name>[\w\.]+) +y +(?P<ost>\d+\.\d+) +x +"
+            patternstring += r"(?P<nord>\d+\.\d+) +z +(?P<z>\d+\.\d+)? +c +"
+            patternstring += r"(?P<pktcode>.{3}) *(?P<beschr>[\w\.-]* *[\w\.-]*){0,1}"
 
         else:
             pattern = {'p': r'(?P<name>\w[\w\.]*)',
@@ -80,9 +105,7 @@ class CooReader:
                        't': r'(?P<text>[\w\.- ]+)'}
 
             fmtkeys = list(self.fmt.lower())
+            patternstring = [pattern[key] for key in fmtkeys]
+            patternstring = self.sep.join(patternstring)
 
-            fmtstring = [pattern[key] for key in fmtkeys]
-
-            fmtstring = self.sep.join(fmtstring)
-
-            return re.compile(fmtstring, re.IGNORECASE)
+        return re.compile(pattern, re.IGNORECASE)
