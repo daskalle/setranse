@@ -108,4 +108,4 @@ class CooReader:
             patternstring = [pattern[key] for key in fmtkeys]
             patternstring = self.sep.join(patternstring)
 
-        return re.compile(pattern, re.IGNORECASE)
+        return re.compile(patternstring, re.IGNORECASE)
